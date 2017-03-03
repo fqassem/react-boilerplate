@@ -16,5 +16,5 @@ const makeSelectLocationState = () => {
 };
 
 export {
-  makeSelectLocationState,
+  makeSelectLocationState
 };

@@ -23,7 +23,7 @@ describe('withProgressBar()', () => {
   }
 
   const router = {
-    listenBefore: () => (() => {}),
+    listenBefore: () => (() => {})
   };
 
   const HocComponent = withProgressBar(Component);

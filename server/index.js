@@ -19,7 +19,7 @@ if (!usingWebpackDevServer) {
   app = express();
   setup(app, {
     outputPath: resolve(process.cwd(), 'build'),
-    publicPath: '/',
+    publicPath: '/'
   });
 } else {
     /* eslint-disable global-require */
@@ -28,7 +28,7 @@ if (!usingWebpackDevServer) {
 
   app = new (require('webpack-dev-server'))(compiler, {
     publicPath: webpackConfig.output.publicPath,
-    hot: true,
+    hot: true
   });
   /* eslint-enable global-require */
 }

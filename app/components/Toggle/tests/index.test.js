@@ -11,12 +11,12 @@ describe('<Toggle />', () => {
     const messages = defineMessages({
       en: {
         id: 'boilerplate.containers.LocaleToggle.en',
-        defaultMessage: defaultEnMessage,
+        defaultMessage: defaultEnMessage
       },
       de: {
         id: 'boilerplate.containers.LocaleToggle.en',
-        defaultMessage: defaultDeMessage,
-      },
+        defaultMessage: defaultDeMessage
+      }
     });
     const renderedComponent = shallow(
       <IntlProvider locale="en">

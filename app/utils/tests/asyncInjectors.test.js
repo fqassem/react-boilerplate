@@ -11,7 +11,7 @@ import configureStore from '../../store';
 import {
   injectAsyncReducer,
   injectAsyncSagas,
-  getAsyncInjectors,
+  getAsyncInjectors
 } from '../asyncInjectors';
 
 // Fixtures
@@ -32,7 +32,7 @@ function* testSaga() {
 }
 
 const sagas = [
-  testSaga,
+  testSaga
 ];
 
 describe('asyncInjectors', () => {

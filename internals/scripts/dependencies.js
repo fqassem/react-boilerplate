@@ -36,7 +36,7 @@ if (!exists(dllManifestPath)) {
       private: true,
       author: pkg.author,
       repository: pkg.repository,
-      version: pkg.version,
+      version: pkg.version
     }), null, 2),
     'utf8'
   );

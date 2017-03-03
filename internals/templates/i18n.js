@@ -11,7 +11,7 @@ import { DEFAULT_LOCALE } from './containers/App/constants'; // eslint-disable-l
 import enTranslationMessages from './translations/en.json';
 
 export const appLocales = [
-  'en',
+  'en'
 ];
 
 addLocaleData(enLocaleData);
@@ -30,5 +30,5 @@ export const formatTranslationMessages = (locale, messages) => {
 };
 
 export const translationMessages = {
-  en: formatTranslationMessages('en', enTranslationMessages),
+  en: formatTranslationMessages('en', enTranslationMessages)
 };

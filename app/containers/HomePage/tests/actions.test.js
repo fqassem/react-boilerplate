@@ -1,9 +1,9 @@
 import {
-  CHANGE_USERNAME,
+  CHANGE_USERNAME
 } from '../constants';
 
 import {
-  changeUsername,
+  changeUsername
 } from '../actions';
 
 describe('Home Actions', () => {
@@ -12,7 +12,7 @@ describe('Home Actions', () => {
       const fixture = 'Max';
       const expectedResult = {
         type: CHANGE_USERNAME,
-        name: fixture,
+        name: fixture
       };
 
       expect(changeUsername(fixture)).toEqual(expectedResult);

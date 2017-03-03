@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-'use strict';
 
 const shell = require('shelljs');
 const exec = require('child_process').exec;
 const path = require('path');
-const fs   = require('fs');
+const fs = require('fs');
 const animateProgress = require('./helpers/progress');
 const addCheckMark = require('./helpers/checkmark');
 const readline = require('readline');
@@ -17,10 +16,10 @@ process.stdout.write('\n');
 let interval = animateProgress('Cleaning old repository');
 process.stdout.write('Cleaning old repository');
 
-cleanRepo(function () {
+cleanRepo(() => {
   clearInterval(interval);
   process.stdout.write('\nInstalling dependencies... (This might take a while)');
-  setTimeout(function () {
+  setTimeout(() => {
     readline.cursorTo(process.stdout, 0);
     interval = animateProgress('Installing dependencies');
   }, 500);
@@ -54,12 +53,12 @@ function deleteFileInCurrentDir(file, callback) {
  * Installs dependencies
  */
 function installDeps() {
-  exec('node --version', function (err, stdout, stderr) {
+  exec('node --version', (err, stdout, stderr) => {
     const nodeVersion = stdout && parseFloat(stdout.substring(1));
     if (nodeVersion < 5 || err) {
       installDepsCallback(err || 'Unsupported node.js version, make sure you have the latest version installed.');
     } else {
-      exec('yarn --version', function (err, stdout, stderr) {
+      exec('yarn --version', (err, stdout, stderr) => {
         if (parseFloat(stdout) < 0.15 || err || process.env.USE_YARN === 'false') {
           exec('npm install', addCheckMark.bind(null, installDepsCallback));
         } else {
@@ -82,10 +81,10 @@ function installDepsCallback(error) {
     process.exit(1);
   }
 
-  deleteFileInCurrentDir('setup.js', function () {
+  deleteFileInCurrentDir('setup.js', () => {
     interval = animateProgress('Initialising new repository');
     process.stdout.write('Initialising new repository');
-    initGit(function () {
+    initGit(() => {
       clearInterval(interval);
       process.stdout.write('\nDone!');
       process.exit(0);

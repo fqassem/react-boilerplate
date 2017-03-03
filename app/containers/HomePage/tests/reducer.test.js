@@ -2,14 +2,14 @@ import { fromJS } from 'immutable';
 
 import homeReducer from '../reducer';
 import {
-  changeUsername,
+  changeUsername
 } from '../actions';
 
 describe('homeReducer', () => {
   let state;
   beforeEach(() => {
     state = fromJS({
-      username: '',
+      username: ''
     });
   });
 
