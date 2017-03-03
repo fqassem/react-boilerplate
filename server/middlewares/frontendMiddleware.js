@@ -29,6 +29,10 @@ const addDevMiddlewares = (app, webpackConfig) => {
       const filename = req.path.replace(/^\//, '');
       res.sendFile(path.join(process.cwd(), pkg.dllPlugin.path, filename));
     });
+    app.get(/\.dll\.js.map$/, (req, res) => {
+      const filename = req.path.replace(/^\//, '');
+      res.sendFile(path.join(process.cwd(), pkg.dllPlugin.path, filename));
+    });
   }
 
   app.get('*', (req, res) => {

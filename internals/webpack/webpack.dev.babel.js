@@ -1,7 +1,3 @@
-/**
- * DEVELOPMENT WEBPACK CONFIGURATION
- */
-
 const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');
@@ -10,7 +6,19 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 const logger = require('../../server/logger');
 const cheerio = require('cheerio');
 const pkg = require(path.resolve(process.cwd(), 'package.json'));
+
+/*
+If we're using Webpack-Dev-Server, we need to add the DLL to the index.html using AddAssetHtmlPlugin
+If we're using the default server (with middleware), we'll need to add it to the entries
+*/
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
+
+const argv = require('minimist')(process.argv.slice(2));
+const defaults = require('lodash/defaultsDeep');
 const dllPlugin = pkg.dllPlugin;
+const dllConfig = defaults(pkg.dllPlugin, dllPlugin.defaults);
+const dllOutputPath = path.join(process.cwd(), dllConfig.path);
+const usingWebpackDevServer = argv.env && argv.env.wds;
 
 const plugins = [
   new webpack.HotModuleReplacementPlugin(), // Tell webpack we want hot reloading
@@ -25,11 +33,18 @@ const plugins = [
   }),
 ];
 
+// Need the DLL to be added to the HTML in order for the dev server to load it
+// The config for the default hot-server doesn't need this because the server config
+// knows to load the config by configuring routes
+if (usingWebpackDevServer) {
+  plugins.push(new AddAssetHtmlPlugin({
+    filepath: require.resolve(path.join(dllOutputPath, 'reactBoilerplateDeps.dll.js')),
+  }));
+}
+
 module.exports = require('./webpack.base.babel')({
   // Add hot reloading in development
-  entry: [
-    path.join(process.cwd(), 'app/app.js'), // Start with js/app.js
-  ],
+  entry: createEntries(),
 
   // Don't use hashes in dev mode for better performance
   output: {
@@ -57,7 +72,7 @@ module.exports = require('./webpack.base.babel')({
   },
 });
 
-/**
+/*
  * Select which plugins to use to optimize the bundle's handling of
  * third party dependencies.
  *
@@ -81,28 +96,27 @@ function dependencyHandlers() {
       }),
     ];
   }
-
   const dllPath = path.resolve(process.cwd(), dllPlugin.path || 'node_modules/react-boilerplate-dlls');
 
   /**
    * If DLLs aren't explicitly defined, we assume all production dependencies listed in package.json
    * Reminder: You need to exclude any server side dependencies by listing them in dllConfig.exclude
    */
-  // if (!dllPlugin.dlls) {
-  //   const manifestPath = path.resolve(dllPath, 'reactBoilerplateDeps.json');
-  //
-  //   if (!fs.existsSync(manifestPath)) {
-  //     logger.error('The DLL manifest is missing. Please run `npm run build:dll`');
-  //     process.exit(0);
-  //   }
-  //
-  //   return [
-  //     new webpack.DllReferencePlugin({
-  //       context: process.cwd(),
-  //       manifest: require(manifestPath), // eslint-disable-line global-require
-  //     }),
-  //   ];
-  // }
+  if (!dllPlugin.dlls) {
+    const manifestPath = path.resolve(dllPath, 'reactBoilerplateDeps.json');
+
+    if (!fs.existsSync(manifestPath)) {
+      logger.error('The DLL manifest is missing. Please run `npm run build:dll`');
+      process.exit(0);
+    }
+
+    return [
+      new webpack.DllReferencePlugin({
+        context: process.cwd(),
+        manifest: require(manifestPath), // eslint-disable-line global-require
+      }),
+    ];
+  }
 
   // If DLLs are explicitly defined, we automatically create a DLLReferencePlugin for each of them.
   const dllManifests = Object.keys(dllPlugin.dlls).map((name) => path.join(dllPath, `/${name}.json`));
@@ -143,4 +157,20 @@ function templateContent() {
   dllNames.forEach((dllName) => body.append(`<script data-dll='true' src='/${dllName}.dll.js'></script>`));
 
   return doc.toString();
+}
+
+/*
+    Based on the currently selected hot server
+    If we're using the hot middleware, we need to add it
+    to the entries. If not, we can safely omit it
+*/
+function createEntries() {
+  const entries = [];
+  if (usingWebpackDevServer) {
+    entries.push('webpack/hot/dev-server');
+  } else {
+    entries.push('webpack-hot-middleware/client?reload=true');
+  }
+  entries.push(path.join(process.cwd(), 'app/app.js'));
+  return entries;
 }
