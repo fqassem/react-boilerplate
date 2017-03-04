@@ -160,15 +160,23 @@ function templateContent() {
 }
 
 /*
-    Based on the currently selected hot server
-    If we're using the hot middleware, we need to add it
-    to the entries. If not, we can safely omit it
+    Based on the currently selected dev server, we need to
+    create different entry points
+
+    Webpack Dev Server just needs 'webpack/hot/dev-server'. It uses
+    SockJS, which work on even the oldest browsers that don't have native WebSocket support
+
+    Webpack-hot-middleware uses the EventSource API, which is not
+    fully supported on all browsers (like IE and older Webkits). We
+    include the eventsource-polyfill and the hot middleware entry point
+    to support it
 */
 function createEntries() {
   const entries = [];
   if (usingWebpackDevServer) {
     entries.push('webpack/hot/dev-server');
   } else {
+    entries.push('eventsource-polyfill');
     entries.push('webpack-hot-middleware/client?reload=true');
   }
   entries.push(path.join(process.cwd(), 'app/app.js'));
